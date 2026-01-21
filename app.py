@@ -5,7 +5,7 @@ import json
 from datetime import datetime
 
 # --- 1. DESIGN STUDIO CONFIGURATION ---
-st.set_page_config(page_title="Kaydiem Titan v7.1 | High-Contrast Architect", layout="wide", page_icon="💎")
+st.set_page_config(page_title="Kaydiem Titan v7.2 | Premium Web Architect", layout="wide", page_icon="💎")
 
 st.markdown("""
     <style>
@@ -23,27 +23,27 @@ st.markdown("""
 # --- SIDEBAR: DESIGN STUDIO ---
 with st.sidebar:
     st.image("https://www.gstatic.com/images/branding/product/2x/business_profile_96dp.png", width=50)
-    st.title("Titan v7.1 Studio")
+    st.title("Titan v7.2 Studio")
     
     with st.expander("🎭 Architecture", expanded=True):
         layout_dna = st.selectbox("Design DNA", ["Classic Royal", "Industrial Titan", "Soft-UI", "Glass-Tech", "Brutalist"])
-        p_color = st.color_picker("Primary Brand Color", "#4A0E0E") # Maroon
-        s_color = st.color_picker("Accent/CTA Color", "#D4AF37") # Gold
+        p_color = st.color_picker("Primary Brand Color", "#4A0E0E")
+        s_color = st.color_picker("Accent/CTA Color", "#D4AF37")
         border_rad = st.select_slider("Corner Roundness", options=["0px", "12px", "24px", "60px"], value="60px")
 
     with st.expander("✍️ Typography", expanded=True):
         h_font = st.selectbox("Heading Font", ["Playfair Display", "Oswald", "Montserrat", "Syncopate"])
         b_font = st.selectbox("Body Font", ["Montserrat", "Inter", "Roboto"])
-        h_weight = st.select_slider("Weight", options=["300", "400", "700", "900"], value="900")
-        ls = st.select_slider("Letter Spacing", options=["-0.05em", "-0.02em", "0em", "0.05em"], value="0.05em")
+        h_weight = st.select_slider("Weight", options=["300", "400", "700", "900"], value="700")
+        ls = st.select_slider("Letter Spacing", options=["-0.05em", "-0.02em", "0em", "0.05em", "0.1em"], value="0.05em")
 
     gsc_tag = st.text_input("GSC Verification Tag")
     st.info("Built by www.kaydiemscriptlab.com")
 
-st.title("🏗️ Kaydiem Titan Supreme v7.1")
+st.title("🏗️ Kaydiem Titan Supreme v7.2")
 
 # --- 2. MULTI-TAB DATA COLLECTION ---
-tabs = st.tabs(["📍 Identity", "🏗️ Content & SEO", "🖼️ Photos", "⚡ Live E-com", "🌟 Trust", "⚖️ Legal"])
+tabs = st.tabs(["📍 Identity", "🏗️ Content & SEO", "🖼️ Photos", "⚡ Live E-com", "🌟 Social Proof", "⚖️ Legal"])
 
 with tabs[0]:
     c1, c2 = st.columns(2)
@@ -86,7 +86,7 @@ with tabs[5]:
     priv_body = st.text_area("Privacy Policy Content", height=300)
     terms_body = st.text_area("Terms Content", height=300)
 
-# --- 3. THE SUPREME ENGINE V7.1 ---
+# --- 3. THE SUPREME ENGINE V7.2 ---
 
 if st.button("🚀 DEPLOY 1st CLASS DYNAMIC ASSET"):
     
@@ -108,19 +108,14 @@ if st.button("🚀 DEPLOY 1st CLASS DYNAMIC ASSET"):
     :root {{ --p: {p_color}; --s: {s_color}; --radius: {border_rad}; }}
     body {{ font-family: '{b_font}', sans-serif; color: #0f172a; line-height: 1.7; overflow-x: hidden; width: 100%; }}
     h1, h2, h3 {{ font-family: '{h_font}', sans-serif; font-weight: {h_weight}; letter-spacing: {ls}; text-transform: uppercase; line-height: 1.1; }}
-    
     .hero-title {{ font-size: clamp(2.2rem, 9vw, 110px); text-shadow: 0 4px 20px rgba(0,0,0,0.4); }}
     .section-title {{ font-size: clamp(1.8rem, 6vw, 75px); color: var(--p); }}
-    
-    /* RECTIFIED CTA BUTTONS */
     .btn-p {{ background: var(--p); color: white; padding: 1.1rem 2.8rem; border-radius: var(--radius); font-weight: 900; transition: all 0.4s; display: inline-block; }}
     .btn-accent {{ background: var(--s); color: white; padding: 1.1rem 2.8rem; border-radius: var(--radius); font-weight: 900; transition: all 0.4s; display: inline-block; text-align: center; box-shadow: 0 10px 20px -5px var(--s); }}
     .btn-accent:hover {{ transform: translateY(-3px); filter: brightness(1.1); box-shadow: 0 15px 30px -5px var(--s); }}
-    
     .glass-nav {{ background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(15px); border-bottom: 1px solid rgba(0,0,0,0.08); width: 100%; }}
     .hero-mask {{ background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.5)), url('{img_h}'); background-size: cover; background-position: center; min-height: 90vh; display: flex; align-items: center; justify-content: center; }}
     .wa-float {{ position: fixed; bottom: 30px; right: 30px; background: #25d366; color: white; width: 65px; height: 65px; border-radius: 50px; display: flex; align-items: center; justify-content: center; z-index: 99999; box-shadow: 0 10px 25px rgba(37,211,102,0.4); }}
-    
     .legal-text {{ white-space: pre-wrap; word-wrap: break-word; font-size: 1.15rem; color: #334155; }}
     .legal-bold-title {{ font-weight: 900; font-size: clamp(2.5rem, 7vw, 5rem); color: var(--p); margin-bottom: 2.5rem; text-transform: uppercase; line-height: 1; }}
     .product-grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2.5rem; }}
@@ -183,7 +178,7 @@ if st.button("🚀 DEPLOY 1st CLASS DYNAMIC ASSET"):
     <nav class="glass-nav sticky top-0 z-50 p-4 md:p-6">
         <div class="max-w-[1440px] mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
             <a href="index.html" class="flex items-center">{logo_html}</a>
-            <div class="flex items-center space-x-6 md:space-x-12 text-[10px] md:text-xs font-black uppercase tracking-widest text-slate-600">
+            <div class="flex items-center space-x-6 md:space-x-10 text-[10px] md:text-xs font-black uppercase tracking-widest text-slate-600">
                 <a href="index.html" class="hover:text-blue-600">Home</a> <a href="about.html">About</a> <a href="contact.html">Contact</a>
                 <a href="tel:{biz_phone}" class="btn-accent" style="padding: 0.5rem 1.5rem; font-size: 10px;">CALL NOW</a>
             </div>
@@ -202,7 +197,7 @@ if st.button("🚀 DEPLOY 1st CLASS DYNAMIC ASSET"):
                         {"".join([f'<span class="bg-slate-800 text-[10px] px-3 py-1 rounded-full uppercase font-bold text-white tracking-widest border border-slate-700">{area}</span>' for area in area_list])}
                     </div>
                 </div>
-                <p class="text-[10px] mt-10 opacity-30 uppercase font-black tracking-widest italic">Built by <a href="https://www.kaydiemscriptlab.com" class="text-white underline">Kaydiem Script Lab</a></p>
+                <p class="text-[10px] mt-10 opacity-30 uppercase font-black tracking-widest italic tracking-widest">Architected By <a href="https://www.kaydiemscriptlab.com" class="text-white underline">Kaydiem Script Lab</a></p>
             </div>
             <div><h4 class="text-white font-bold mb-8 uppercase text-xs">Navigation</h4>
                 <ul class="space-y-4 text-sm font-bold uppercase"><li><a href="privacy.html" class="hover:text-white transition">Privacy Policy</a></li><li><a href="terms.html" class="hover:text-white transition">Terms</a></li></ul>
@@ -214,6 +209,23 @@ if st.button("🚀 DEPLOY 1st CLASS DYNAMIC ASSET"):
 </body></html>"""
 
     # --- ENHANCED INDEX CONTENT ---
+    serv_html = "".join([f'<div class="bg-slate-50 p-12 rounded-[2.5rem] border border-slate-100 shadow-xl hover:scale-[1.02] transition-transform"><h3 class="text-2xl font-black mb-4 uppercase" style="color:var(--p)">{s.strip()}</h3><p class="text-slate-500 text-sm leading-relaxed font-bold uppercase tracking-tight italic">Premium verified solution for {biz_name}.</p></div>' for s in biz_serv.splitlines() if s.strip()])
+    
+    # Corrected variable name here to match current context
+    testi_html = "".join([f'<div class="p-10 bg-slate-50 rounded-[3rem] border border-slate-100 italic text-xl shadow-inner mb-8">"{t.split("|")[1].strip()}"<br><span class="font-black not-italic text-sm block mt-6 uppercase tracking-widest text-brand" style="color:var(--p)">— {t.split("|")[0].strip()} <span class="text-emerald-500 font-black ml-2">● Partner</span></span></div>' for t in testi.splitlines() if "|" in t])
+    
+    faq_html = "".join([f'<details class="mb-6 bg-white p-6 rounded-2xl border border-slate-100 cursor-pointer shadow-sm"><summary class="font-black text-lg uppercase tracking-tight">{f.split("?")[0].strip()}?</summary><p class="mt-4 text-slate-600 leading-relaxed font-medium">{f.split("?")[1].strip()}</p></details>' for f in faqs.splitlines() if "?" in f])
+
+    dynamic_section = ""
+    if sheet_url:
+        dynamic_section = f"""
+        <section id="inventory" class="py-32 px-6 max-w-[1440px] mx-auto text-center border-b">
+            <h2 class="section-title mb-20 uppercase tracking-tighter">Exclusive Offers</h2>
+            <div id="live-data-container" class="product-grid text-left">
+                <p class="p-20 text-center text-slate-400 font-bold animate-pulse uppercase tracking-widest">Connecting to Real-time Inventory...</p>
+            </div>
+        </section>"""
+
     idx_content = f"""
     <section class="hero-mask px-6 text-center text-white">
         <div class="max-w-[1200px] mx-auto">
@@ -223,12 +235,12 @@ if st.button("🚀 DEPLOY 1st CLASS DYNAMIC ASSET"):
         </div>
     </section>
     
-    <section id="inventory" class="py-32 px-6 max-w-[1440px] mx-auto text-center border-b">
-        <h2 class="section-title mb-20 uppercase tracking-tighter">Exclusive Offers</h2>
-        <div id="live-data-container" class="product-grid text-left">
-            <p class="p-20 text-center text-slate-400 font-bold animate-pulse uppercase tracking-widest">Connecting to Real-time Inventory...</p>
-        </div>
+    <section class="max-w-[1440px] mx-auto py-24 px-6 text-center">
+        <h2 class="section-title mb-20 uppercase tracking-tighter" style="color:var(--p)">Our Expertise</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-10 text-left">{serv_html}</div>
     </section>
+
+    {dynamic_section}
 
     <section class="bg-slate-50 py-32 px-6 border-y">
         <div class="max-w-[1440px] mx-auto grid md:grid-cols-2 gap-24 items-center text-left">
@@ -241,15 +253,14 @@ if st.button("🚀 DEPLOY 1st CLASS DYNAMIC ASSET"):
         </div>
     </section>
 
-    <section class="py-32 px-6 max-w-[1440px] mx-auto text-center">
+    <section class="py-32 px-6 max-w-7xl mx-auto text-center">
         <div class="grid md:grid-cols-2 gap-24 text-left">
-            <div><h2 class="text-4xl font-black mb-16 uppercase tracking-tighter" style="color:var(--p)">Partner Success</h2>{testi_cards}</div>
+            <div><h2 class="text-4xl font-black mb-16 uppercase tracking-tighter" style="color:var(--p)">Partner Success</h2>{testi_html}</div>
             <div><h2 class="text-4xl font-black mb-16 uppercase tracking-tighter" style="color:var(--p)">Expert Insights</h2>{faq_html}</div>
         </div>
     </section>
     """
 
-    # --- ZIP OUTPUT ---
     zip_buf = io.BytesIO()
     with zipfile.ZipFile(zip_buf, "a", zipfile.ZIP_DEFLATED, False) as zf:
         zf.writestr("index.html", get_layout("Home", seo_d, idx_content, True))
@@ -261,5 +272,5 @@ if st.button("🚀 DEPLOY 1st CLASS DYNAMIC ASSET"):
         zf.writestr("robots.txt", f"User-agent: *\nAllow: /\nSitemap: {prod_url}sitemap.xml")
         zf.writestr("sitemap.xml", f'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>{prod_url}index.html</loc></url><url><loc>{prod_url}about.html</loc></url></urlset>')
 
-    st.success("💎 TITAN SUPREME v7.1 DEPLOYED. Accent Contrast & Bold Legal active.")
-    st.download_button("📥 DOWNLOAD COMPLETE BIZ PACKAGE", zip_buf.getvalue(), f"{biz_name.lower()}_v7_1.zip")
+    st.success("💎 TITAN SUPREME v7.2 DEPLOYED. Bugs Fixed.")
+    st.download_button("📥 DOWNLOAD COMPLETE BIZ PACKAGE", zip_buf.getvalue(), f"{biz_name.lower()}_v7_2.zip")
