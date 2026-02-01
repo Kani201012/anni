@@ -1,7 +1,8 @@
 import streamlit as st
 import zipfile
 import io
-import json
+import urllib.parse
+import datetime
 
 # --- 1. APP CONFIGURATION ---
 st.set_page_config(
@@ -41,13 +42,6 @@ st.markdown("""
         box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1) !important;
     }
     
-    /* Feature Toggles */
-    div[data-testid="stCheckbox"] label {
-        background: #f1f5f9; padding: 0.75rem; border-radius: 8px; width: 100%;
-        border: 1px solid #e2e8f0; font-weight: 600; cursor: pointer; transition: 0.2s;
-    }
-    div[data-testid="stCheckbox"] label:hover { background: #e2e8f0; }
-
     /* Action Buttons */
     .stButton>button {
         width: 100%; border-radius: 8px; height: 3.5rem;
@@ -125,11 +119,9 @@ with tabs[0]:
         biz_phone = st.text_input("Phone", "+1 (555) 000-0000")
         biz_email = st.text_input("Email", "hello@novadynamics.io")
     with c2:
-        prod_url = st.text_input("Website URL", "https://novadynamics.io")
+        prod_url = st.text_input("Website URL (Required for Sitemap)", "https://novadynamics.io")
         biz_addr = st.text_area("Address", "101 Tech Plaza, Silicon Valley, CA", height=100)
-        # RESTORED: Map Iframe for Contact Page
         map_iframe = st.text_area("Google Map Embed Code", placeholder='<iframe src="..."></iframe>', height=100)
-        # RESTORED: Meta Description Input
         seo_d = st.text_area("Meta Description (SEO)", "The leading provider of advanced solutions for modern enterprises.", height=100)
         logo_url = st.text_input("Logo URL (PNG/SVG)")
         
@@ -145,28 +137,41 @@ with tabs[1]:
     hero_sub = st.text_input("Hero Subtext", "The all-in-one solution for modern enterprises looking to dominate their local market.")
     hero_img = st.text_input("Hero Background Image", "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=1600")
     
+    st.subheader("Trust Stats (The Blue Strip)")
+    st.caption("Enter your numbers below. They will appear in the dark blue strip.")
+    s1, s2, s3 = st.columns(3)
+    stat_1 = s1.text_input("Stat 1 (e.g. 10+)", "10+")
+    stat_1_txt = s1.text_input("Label 1", "Years")
+    stat_2 = s2.text_input("Stat 2 (e.g. 500+)", "500+")
+    stat_2_txt = s2.text_input("Label 2", "Clients")
+    stat_3 = s3.text_input("Stat 3 (e.g. 100%)", "100%")
+    stat_3_txt = s3.text_input("Label 3", "Satisfaction")
+
     st.subheader("Feature Grid")
     f_title = st.text_input("Features Title", "Our Expertise")
     feat_data = st.text_area("Features List (Title | Description)", 
                              "Global Reach | We operate in 50+ countries.\n24/7 Support | Always here when you need us.\nSecure Core | Bank-grade encryption standard.",
                              height=150)
     
-    st.subheader("About / Gallery")
+    st.subheader("About Section")
     about_h = st.text_input("About Title", "Our Legacy")
-    about_txt = st.text_area("About Description", "Founded in 2020, Nova Dynamics has revolutionized the way businesses approach digital transformation...", height=150)
+    # FIX: Split into short summary (Home) and Full (About Page)
+    about_summary = st.text_area("Home Page Summary (Short)", "Founded in 2020, Nova Dynamics has revolutionized the way businesses approach digital transformation. We bridge the gap between complex challenges and elegant solutions.", height=100)
+    about_txt = st.text_area("Full About Description (About Page)", "The Future of Digital Architecture... (Paste your long text here). We specialize in building Liquid Infrastructure...", height=200)
     about_img = st.text_input("About Side Image", "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=1600")
 
 with tabs[2]:
     st.info("⚡ Power your inventory with a Google Sheet")
     sheet_url = st.text_input("Google Sheet CSV Link", placeholder="https://docs.google.com/spreadsheets/d/e/.../pub?output=csv")
-    # RESTORED: Default Image for products
     custom_feat = st.text_input("Default Product Image URL (Fallback)", "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&q=80&w=800")
     st.caption("Required Columns: Name, Price, Description, ImageURL")
 
 with tabs[3]:
     st.subheader("Trust & Legal")
     testi_data = st.text_area("Testimonials (Name | Quote)", "TechDaily | A game changer for our ops.\nCEO, Acme | Highly recommended.", height=100)
-    faq_data = st.text_area("FAQ (Q? ? A)", "Is this secure? ? Yes, 100% encrypted.\nCan I cancel? ? Anytime.", height=100)
+    # FIX: Clarified instruction for FAQ
+    st.subheader("Frequently Asked Questions")
+    faq_data = st.text_area("FAQ List (Question ? Answer)", "Is this secure? ? Yes, 100% encrypted.\nCan I cancel? ? Anytime, no hidden fees.", height=150)
     
     l1, l2 = st.columns(2)
     priv_txt = l1.text_area("Privacy Policy Text", "We respect your data...", height=150)
@@ -201,6 +206,8 @@ def get_theme_css():
     elif anim_type == "Zoom In":
         anim_css = ".reveal { opacity: 0; transform: scale(0.95); transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); } .reveal.active { opacity: 1; transform: scale(1); }"
     
+    hero_bg_css = f"background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.4)), url('{hero_img}');" if hero_img else "background: var(--p);"
+
     return f"""
     :root {{
         --p: {p_color}; --s: {s_color}; --bg: {bg_color}; --txt: {text_color}; --card: {card_bg};
@@ -213,7 +220,7 @@ def get_theme_css():
     h1, h2, h3, h4 {{ font-family: var(--h-font); color: var(--p); line-height: 1.1; margin-bottom: 1rem; }}
     
     .container {{ max-width: 1280px; margin: 0 auto; padding: 0 20px; }}
-    .btn {{ display: inline-block; padding: 1rem 2.5rem; border-radius: var(--radius); font-weight: 700; text-decoration: none; transition: 0.3s; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; border: none; }}
+    .btn {{ display: inline-block; padding: 1rem 2.5rem; border-radius: var(--radius); font-weight: 700; text-decoration: none; transition: 0.3s; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; border: none; text-align: center; }}
     .btn-primary {{ background: var(--p); color: white; }}
     .btn-accent {{ background: var(--s); color: white; box-shadow: 0 10px 25px -5px var(--s); }}
     .btn:hover {{ transform: translateY(-3px); filter: brightness(1.15); }}
@@ -223,7 +230,7 @@ def get_theme_css():
     .nav-links a {{ margin-left: 2rem; text-decoration: none; font-weight: 600; color: var(--txt); font-size: 0.9rem; opacity: 0.8; transition:0.2s; }}
     .nav-links a:hover {{ opacity: 1; color: var(--s); }}
     
-    .hero {{ min-height: 90vh; display: flex; align-items: center; justify-content: center; text-align: center; background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.4)), url('{hero_img}'); background-size: cover; background-position: center; color: white; padding-top: 80px; }}
+    .hero {{ min-height: 90vh; display: flex; align-items: center; justify-content: center; text-align: center; {hero_bg_css} background-size: cover; background-position: center; color: white; padding-top: 80px; }}
     .hero h1 {{ color: white; font-size: clamp(2.5rem, 8vw, 5rem); margin-bottom: 1.5rem; }}
     .hero p {{ color: rgba(255,255,255,0.9); font-size: clamp(1.1rem, 2vw, 1.5rem); max-width: 700px; margin: 0 auto 2.5rem auto; }}
     
@@ -237,12 +244,24 @@ def get_theme_css():
     
     .prod-img {{ width: 100%; height: 250px; object-fit: cover; border-radius: calc(var(--radius) - 4px); margin-bottom: 1.5rem; background: #f1f5f9; }}
     
-    /* FOOTER FIX: Forces high contrast links */
+    /* FAQ Specific CSS */
+    .faq-item {{ border-bottom: 1px solid rgba(100,100,100,0.1); padding: 1.5rem 0; }}
+    .faq-item h3 {{ font-size: 1.2rem; margin-bottom: 0.5rem; color: var(--txt); }}
+    .faq-item p {{ opacity: 0.8; font-size: 0.95rem; }}
+
+    /* FIX: Stats Section Visibility Force Color */
+    .stat-box h3 {{ color: #ffffff !important; font-size: 3rem; margin-bottom: 0.5rem; }}
+    .stat-box p {{ color: rgba(255,255,255,0.8); text-transform: uppercase; letter-spacing: 1px; }}
+
+    /* Footer Logic */
     footer {{ background: var(--p); color: white; padding: 4rem 0; margin-top: auto; }}
     .footer-grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 3rem; }}
     .footer a, footer a {{ color: rgba(255,255,255,0.8) !important; text-decoration: none; display: block; margin-bottom: 0.5rem; transition: 0.3s; }}
     .footer a:hover, footer a:hover {{ color: #ffffff !important; text-decoration: underline; }}
     
+    .detail-view {{ display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start; }}
+    @media(max-width: 768px) {{ .detail-view {{ grid-template-columns: 1fr; }} }}
+
     {anim_css}
     
     @media (max-width: 768px) {{
@@ -258,8 +277,8 @@ def gen_nav():
         <a href="index.html" style="text-decoration:none">{logo_display}</a>
         <div class="nav-links">
             <a href="index.html">Home</a>
-            {'<a href="#features">Features</a>' if show_features else ''}
-            {'<a href="#inventory">Products</a>' if show_inventory else ''}
+            {'<a href="index.html#features">Features</a>' if show_features else ''}
+            {'<a href="index.html#inventory">Products</a>' if show_inventory else ''}
             <a href="about.html">About</a>
             <a href="contact.html">Contact</a>
             <a href="tel:{biz_phone}" class="btn-accent" style="padding:0.6rem 1.5rem; margin-left:1.5rem; border-radius:50px; color:white !important;">Call Now</a>
@@ -297,7 +316,6 @@ def gen_features():
     """
 
 def gen_inventory_js():
-    # NEW: State Machine Parser for CSV (Handles quotes and spaces correctly)
     return f"""
     <script>
     function parseCSVLine(str) {{
@@ -330,11 +348,11 @@ def gen_inventory_js():
                 if(!lines[i].trim()) continue;
                 const clean = parseCSVLine(lines[i]);
                 
-                // Fallback image logic
                 let img = clean[3] && clean[3].length > 5 ? clean[3] : '{custom_feat}'; 
                 if(clean[6] && clean[6].length > 5) img = clean[6];
 
                 if(clean.length > 1) {{
+                    const prodName = encodeURIComponent(clean[0]);
                     box.innerHTML += `
                     <div class="card reveal">
                         <img src="${{img}}" class="prod-img" onerror="this.src='{custom_feat}'">
@@ -342,16 +360,19 @@ def gen_inventory_js():
                             <div>
                                 <h3>${{clean[0]}}</h3>
                                 <p style="font-weight:bold; color:var(--s); font-size:1.1rem;">${{clean[1]}}</p>
-                                <p style="font-size:0.9rem; opacity:0.7; margin-bottom:1rem;">${{clean[2] || ''}}</p>
+                                <p style="font-size:0.9rem; opacity:0.7; margin-bottom:1rem;">${{clean[2] ? clean[2].substring(0,60)+'...' : ''}}</p>
                             </div>
-                            <a href="https://wa.me/{wa_num}?text=I am interested in ${{encodeURIComponent(clean[0])}}" target="_blank" class="btn-primary btn" style="text-align:center; padding:0.8rem; border-radius:6px; font-size:0.8rem;">Order on WhatsApp</a>
+                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem;">
+                                <a href="product.html?item=${{prodName}}" class="btn" style="background:#e2e8f0; color:var(--primary); padding:0.8rem; font-size:0.8rem;">View Details</a>
+                                <a href="https://wa.me/{wa_num}?text=I am interested in ${{prodName}}" target="_blank" class="btn-primary btn" style="padding:0.8rem; font-size:0.8rem;">WhatsApp</a>
+                            </div>
                         </div>
                     </div>`;
                 }}
             }}
         }} catch(e) {{ console.log(e); }}
     }}
-    window.addEventListener('load', loadInv);
+    if(document.getElementById('inv-grid')) window.addEventListener('load', loadInv);
     </script>
     """
 
@@ -365,20 +386,34 @@ def gen_inventory():
     {gen_inventory_js() if sheet_url else ''}
     """
 
+# FIX: About Section is now shorter for Home Page
 def gen_about_section():
     return f"""
     <section id="about"><div class="container">
         <div class="grid-3" style="grid-template-columns: 1fr 1fr; align-items:center;">
             <div class="reveal">
                 <h2 style="font-size:2.5rem; margin-bottom:1.5rem;">{about_h}</h2>
-                <div style="font-size:1.1rem; opacity:0.8; margin-bottom:2rem;">{about_txt}</div>
-                <div class="grid-3" style="grid-template-columns:1fr 1fr; gap:1rem;">
-                    <div style="padding:1rem; background:rgba(0,0,0,0.03); border-radius:8px;"><strong>50+</strong><br>Projects</div>
-                    <div style="padding:1rem; background:rgba(0,0,0,0.03); border-radius:8px;"><strong>24/7</strong><br>Support</div>
-                </div>
+                <div style="font-size:1.1rem; opacity:0.8; margin-bottom:2rem;">{about_summary}</div>
+                <a href="about.html" class="btn btn-primary">Read Our Full Story</a>
             </div>
             <img src="{about_img}" class="reveal" style="width:100%; border-radius:var(--radius); box-shadow:0 20px 50px -20px rgba(0,0,0,0.2);">
         </div>
+    </div></section>
+    """
+
+# FIX: Added FAQ Function
+def gen_faq():
+    if not show_faq: return ""
+    items = ""
+    for line in faq_data.split('\n'):
+        if "?" in line:
+            q, a = line.split('?', 1)
+            items += f'<div class="faq-item reveal"><h3>{q.strip()}?</h3><p>{a.strip()}</p></div>'
+    
+    return f"""
+    <section id="faq" style="background:var(--card)"><div class="container">
+        <div class="section-head reveal"><h2>Frequently Asked Questions</h2></div>
+        <div style="max-width:800px; margin:0 auto;">{items}</div>
     </div></section>
     """
 
@@ -404,7 +439,7 @@ def gen_footer():
             </div>
         </div>
         <div style="border-top:1px solid rgba(255,255,255,0.1); margin-top:3rem; padding-top:2rem; text-align:center; opacity:0.4; font-size:0.8rem;">
-            &copy; {biz_name}. Powered by Titan Engine.
+            &copy; <a href="https://www.kaydiemscriptlab.com/" target="_blank" style="display:inline; color:white;">Kaydiem Script Lab</a>. Powered by Titan Engine.
         </div>
     </div></footer>
     """
@@ -429,7 +464,7 @@ def gen_scripts():
     </script>
     """
 
-def build_page(title, content):
+def build_page(title, content, extra_js=""):
     css = get_theme_css()
     meta_tags = f'<meta name="description" content="{seo_d}">'
     if gsc_tag: meta_tags += f'\n<meta name="google-site-verification" content="{gsc_tag}">'
@@ -457,31 +492,121 @@ def build_page(title, content):
         {gen_footer()}
         {gen_wa_widget()}
         {gen_scripts()}
+        {extra_js}
     </body>
     </html>
+    """
+
+# --- 404 & Product Pages ---
+def gen_404_content():
+    return f"""
+    <section class="hero" style="min-height:70vh;">
+        <div class="container">
+            <h1 style="font-size:6rem; margin:0;">404</h1>
+            <p>Page Not Found</p>
+            <br>
+            <a href="index.html" class="btn btn-accent">Return Home</a>
+        </div>
+    </section>
+    """
+
+def gen_product_page_content():
+    return f"""
+    <section style="padding-top:150px;">
+        <div class="container">
+            <div id="product-detail" class="detail-view">
+                <div style="background:#eee; height:400px; border-radius:12px; display:flex; align-items:center; justify-content:center;">Loading...</div>
+                <div>Loading...</div>
+            </div>
+        </div>
+    </section>
+    <script>
+    function parseCSVLine(str) {{
+        const res = [];
+        let cur = '';
+        let inQuote = false;
+        for (let i = 0; i < str.length; i++) {{
+            const c = str[i];
+            if (c === '"') {{
+                if (inQuote && str[i+1] === '"') {{ cur += '"'; i++; }}
+                else {{ inQuote = !inQuote; }}
+            }} else if (c === ',' && !inQuote) {{
+                res.push(cur.trim()); cur = '';
+            }} else {{ cur += c; }}
+        }}
+        res.push(cur.trim());
+        return res;
+    }}
+
+    async function loadProduct() {{
+        const params = new URLSearchParams(window.location.search);
+        const targetName = params.get('item');
+        
+        if(!targetName) {{
+            document.getElementById('product-detail').innerHTML = '<h2>Product not found</h2>';
+            return;
+        }}
+
+        try {{
+            const res = await fetch('{sheet_url}');
+            const txt = await res.text();
+            const lines = txt.split(/\\r\\n|\\n/);
+            
+            let found = false;
+            
+            for(let i=1; i<lines.length; i++) {{
+                const clean = parseCSVLine(lines[i]);
+                if(clean.length > 0 && clean[0] === targetName) {{
+                    found = true;
+                    let img = clean[3] && clean[3].length > 5 ? clean[3] : '{custom_feat}'; 
+                    if(clean[6] && clean[6].length > 5) img = clean[6];
+                    
+                    document.getElementById('product-detail').innerHTML = `
+                        <img src="${{img}}" style="width:100%; height:auto; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.1);">
+                        <div>
+                            <h1 style="font-size:3rem; line-height:1.1;">${{clean[0]}}</h1>
+                            <p style="font-size:1.5rem; color:var(--s); font-weight:bold; margin-bottom:1.5rem;">${{clean[1]}}</p>
+                            <p style="line-height:1.8; opacity:0.8; margin-bottom:2rem;">${{clean[2]}}</p>
+                            <a href="https://wa.me/{wa_num}?text=I am interested in ${{encodeURIComponent(clean[0])}}" target="_blank" class="btn btn-primary">Order on WhatsApp</a>
+                            <br><br>
+                            <a href="index.html#inventory" style="text-decoration:none; color:var(--txt); opacity:0.6;">&larr; Back to Shop</a>
+                        </div>
+                    `;
+                    break;
+                }}
+            }}
+            if(!found) document.getElementById('product-detail').innerHTML = '<h2>Product not found in database.</h2>';
+            
+        }} catch(e) {{ console.log(e); }}
+    }}
+    loadProduct();
+    </script>
     """
 
 # --- 6. PAGE CONTENT GENERATION ---
 home_content = ""
 if show_hero: home_content += gen_hero()
-if show_stats: home_content += f'<div style="background:var(--p); color:white; padding:3rem 0; text-align:center;"><div class="container grid-3"><div class="reveal"><h3>10+</h3><p>Years</p></div><div class="reveal"><h3>500+</h3><p>Clients</p></div><div class="reveal"><h3>100%</h3><p>Satisfaction</p></div></div></div>'
+# FIX: Stats Section uses new inputs and forced White Text class 'stat-box'
+if show_stats: home_content += f'<div style="background:var(--p); color:white; padding:3rem 0; text-align:center;"><div class="container grid-3"><div class="reveal stat-box"><h3>{stat_1}</h3><p>{stat_1_txt}</p></div><div class="reveal stat-box"><h3>{stat_2}</h3><p>{stat_2_txt}</p></div><div class="reveal stat-box"><h3>{stat_3}</h3><p>{stat_3_txt}</p></div></div></div>'
 if show_features: home_content += gen_features()
 if show_inventory: home_content += gen_inventory()
 if show_gallery: home_content += gen_about_section()
 if show_testimonials: 
     t_cards = "".join([f'<div class="card reveal" style="text-align:center;"><i>"{x.split("|")[1]}"</i><br><br><b>- {x.split("|")[0]}</b></div>' for x in testi_data.split('\n') if "|" in x])
     home_content += f'<section style="background:#f8fafc"><div class="container"><div class="section-head reveal"><h2>Client Stories</h2></div><div class="grid-3">{t_cards}</div></div></section>'
+# FIX: Added FAQ Function call
+if show_faq: home_content += gen_faq()
 if show_cta: home_content += f'<section style="background:var(--s); color:white; text-align:center;"><div class="container reveal"><h2>Ready to Start?</h2><p style="margin-bottom:2rem;">Let us build your future today.</p><a href="contact.html" class="btn" style="background:white; color:var(--s);">Get a Quote</a></div></section>'
 
 # --- 7. RENDER & DEPLOY ---
 st.divider()
 st.subheader("🚀 Launchpad")
 
-# RESTORED: Multi-Page Preview Switcher
-preview_mode = st.radio("Preview Page:", ["Home", "About", "Contact", "Privacy", "Terms"], horizontal=True)
+preview_mode = st.radio("Preview Page:", ["Home", "About", "Contact", "Privacy", "Terms", "Product Detail (Demo)"], horizontal=True)
 
 # Generate static contents for other pages
-about_content = f'<section class="hero" style="min-height:50vh;"><div class="container"><h1>About Us</h1></div></section><section><div class="container"><p style="font-size:1.2rem; line-height:1.8;">{about_txt}</p></div></section>'
+# FIX: About page now uses the Long Description
+about_page_content = f'<section class="hero" style="min-height:50vh;"><div class="container"><h1>About Us</h1></div></section><section><div class="container"><p style="font-size:1.2rem; line-height:1.8;">{about_txt}</p></div></section>'
 contact_content = f'<section class="hero" style="min-height:50vh;"><div class="container"><h1>Contact Us</h1></div></section><section><div class="container" style="text-align:center;"><h2>{biz_phone}</h2><p>{biz_addr}</p><br>{map_iframe}</div></section>'
 privacy_content = f'<section><div class="container legal-text"><h1>Privacy Policy</h1><br>{priv_txt}</div></section>'
 terms_content = f'<section><div class="container legal-text"><h1>Terms of Service</h1><br>{term_txt}</div></section>'
@@ -491,23 +616,50 @@ with c1:
     if preview_mode == "Home":
         st.components.v1.html(build_page("Home", home_content), height=600, scrolling=True)
     elif preview_mode == "About":
-        st.components.v1.html(build_page("About", about_content), height=600, scrolling=True)
+        st.components.v1.html(build_page("About", about_page_content), height=600, scrolling=True)
     elif preview_mode == "Contact":
         st.components.v1.html(build_page("Contact", contact_content), height=600, scrolling=True)
     elif preview_mode == "Privacy":
         st.components.v1.html(build_page("Privacy", privacy_content), height=600, scrolling=True)
     elif preview_mode == "Terms":
         st.components.v1.html(build_page("Terms", terms_content), height=600, scrolling=True)
+    elif preview_mode == "Product Detail (Demo)":
+        st.warning("Preview only shows layout. Live data requires the downloaded file.")
+        st.components.v1.html(build_page("Product Name", gen_product_page_content()), height=600, scrolling=True)
 
 with c2:
     st.success("System Ready.")
     if st.button("DOWNLOAD WEBSITE ZIP", type="primary"):
         z_b = io.BytesIO()
         with zipfile.ZipFile(z_b, "a", zipfile.ZIP_DEFLATED, False) as zf:
+            # 1. Main Pages
             zf.writestr("index.html", build_page("Home", home_content))
-            zf.writestr("about.html", build_page("About", about_content))
+            zf.writestr("about.html", build_page("About", about_page_content))
             zf.writestr("contact.html", build_page("Contact", contact_content))
             zf.writestr("privacy.html", build_page("Privacy Policy", privacy_content))
             zf.writestr("terms.html", build_page("Terms of Service", terms_content))
+            
+            # 2. Product Detail Page
+            zf.writestr("product.html", build_page("Product Details", gen_product_page_content()))
+
+            # 3. 404 Page
+            zf.writestr("404.html", build_page("404 Not Found", gen_404_content()))
+
+            # 4. Robots.txt
+            robots_txt = f"User-agent: *\nAllow: /\nSitemap: {prod_url}/sitemap.xml"
+            zf.writestr("robots.txt", robots_txt)
+
+            # 5. Sitemap.xml
+            date_str = datetime.date.today().isoformat()
+            sitemap_xml = f"""<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+   <url><loc>{prod_url}/</loc><lastmod>{date_str}</lastmod></url>
+   <url><loc>{prod_url}/index.html</loc><lastmod>{date_str}</lastmod></url>
+   <url><loc>{prod_url}/about.html</loc><lastmod>{date_str}</lastmod></url>
+   <url><loc>{prod_url}/contact.html</loc><lastmod>{date_str}</lastmod></url>
+   <url><loc>{prod_url}/privacy.html</loc><lastmod>{date_str}</lastmod></url>
+   <url><loc>{prod_url}/terms.html</loc><lastmod>{date_str}</lastmod></url>
+</urlset>"""
+            zf.writestr("sitemap.xml", sitemap_xml)
             
         st.download_button("📥 Click to Save", z_b.getvalue(), f"{biz_name.lower().replace(' ','_')}_site.zip", "application/zip")
