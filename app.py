@@ -5,7 +5,7 @@ import urllib.parse
 
 # --- 1. APP CONFIGURATION ---
 st.set_page_config(
-    page_title="Titan v26.3 | Omni Architect", 
+    page_title="Titan v26.5 | Omni Architect", 
     layout="wide", 
     page_icon="⚡",
     initial_sidebar_state="expanded"
@@ -60,7 +60,7 @@ st.markdown("""
 # --- 3. SIDEBAR: THE CONTROL CENTER ---
 with st.sidebar:
     st.title("Titan Architect")
-    st.caption("v26.3 | Omni Core")
+    st.caption("v26.5 | Omni Core")
     st.divider()
     
     # 3.1 VISUAL DNA
@@ -124,11 +124,16 @@ with tabs[0]:
         seo_d = st.text_area("Meta Description (SEO)", "The leading provider of advanced solutions for modern enterprises.", height=100)
         logo_url = st.text_input("Logo URL (PNG/SVG)")
         
-    st.subheader("Social Links")
+    st.subheader("Social Links (Footer Icons)")
     sc1, sc2, sc3 = st.columns(3)
-    wa_num = sc1.text_input("WhatsApp Number (No +)", "15550000000")
-    li_link = sc2.text_input("LinkedIn URL")
-    ig_link = sc3.text_input("Instagram URL")
+    fb_link = sc1.text_input("Facebook URL")
+    ig_link = sc2.text_input("Instagram URL")
+    x_link = sc3.text_input("X (Twitter) URL")
+    
+    sc4, sc5, sc6 = st.columns(3)
+    li_link = sc4.text_input("LinkedIn URL")
+    yt_link = sc5.text_input("YouTube URL")
+    wa_num = sc6.text_input("WhatsApp Number (No +)", "15550000000")
 
 with tabs[1]:
     st.subheader("Hero Section")
@@ -138,9 +143,7 @@ with tabs[1]:
     
     st.divider()
     
-    # NEW: Dedicated Stats Input Section
     st.subheader("Trust Stats Data")
-    st.caption("These numbers will appear on the dark banner. Leave blank to hide.")
     col_s1, col_s2, col_s3 = st.columns(3)
     stat_1 = col_s1.text_input("Stat 1 (e.g., Years)", "10+")
     label_1 = col_s1.text_input("Label 1", "Years Experience")
@@ -159,12 +162,15 @@ with tabs[1]:
                              "Global Reach | We operate in 50+ countries.\n24/7 Support | Always here when you need us.\nSecure Core | Bank-grade encryption standard.",
                              height=150)
     
-    st.subheader("About / Gallery")
+    st.subheader("About Content")
+    st.info("💡 **Formatting Tip:** Wrap titles in double asterisks to make them bold. Example: `**Our Philosophy**`")
+    
     about_h = st.text_input("About Title", "Our Legacy")
-    # NEW: Instruction for user
-    st.caption("Tips: Use 'Enter' to create new paragraphs. Keep it concise for the homepage.")
-    about_txt = st.text_area("About Description", "Founded in 2020, Nova Dynamics has revolutionized the way businesses approach digital transformation.\n\nOur mission is simple: To provide liquid infrastructure for the modern web.", height=150)
     about_img = st.text_input("About Side Image", "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=1600")
+    
+    c_a1, c_a2 = st.columns(2)
+    about_short = c_a1.text_area("Home Page Summary (Short)", "Founded in 2020, Nova Dynamics has revolutionized the way businesses approach digital transformation. We are the architects of the future.", height=200)
+    about_long = c_a2.text_area("Full About Page Content (Long)", "**Our Story**\nWelcome to Nova Dynamics. Based in Silicon Valley...\n\n**Our Philosophy**\nWe believe software should not just function, it should empower...", height=200)
 
 with tabs[2]:
     st.info("⚡ Power your inventory with a Google Sheet")
@@ -174,26 +180,30 @@ with tabs[2]:
 
 with tabs[3]:
     st.subheader("Trust & Legal")
+    st.info("💡 Use `**Title**` for bold headers.")
     testi_data = st.text_area("Testimonials (Name | Quote)", "TechDaily | A game changer for our ops.\nCEO, Acme | Highly recommended.", height=100)
     
-    st.subheader("Frequently Asked Questions")
-    st.caption("Format: Question? ? Answer (Use double ? as separator)")
-    faq_data = st.text_area("FAQ Data", "Is this secure? ? Yes, 100% encrypted.\nCan I cancel? ? Anytime.", height=100)
+    faq_data = st.text_area("FAQ Data (Q? ? A)", "Is this secure? ? Yes, 100% encrypted.\nCan I cancel? ? Anytime.", height=100)
     
     l1, l2 = st.columns(2)
-    priv_txt = l1.text_area("Privacy Policy Text", "We respect your data...\n\nData Collection:\nWe collect email and usage data.", height=200)
-    term_txt = l2.text_area("Terms of Service Text", "By using this site...\n\nUsage:\nYou agree to use the site legally.", height=200)
+    priv_txt = l1.text_area("Privacy Policy Text", "**Introduction**\nWe respect your data...\n\n**Data Collection**\nWe collect email and usage data.", height=200)
+    term_txt = l2.text_area("Terms of Service Text", "**Usage**\nBy using this site...\n\n**Liability**\nYou agree to use the site legally.", height=200)
 
 # --- 5. COMPILER ENGINE ---
 
 def format_text(text):
-    """Converts newlines to HTML paragraphs for better formatting."""
+    """Converts newlines to paragraphs and **text** to Bold Headers."""
     if not text: return ""
     paragraphs = text.split('\n')
     html_out = ""
     for p in paragraphs:
-        if p.strip():
-            html_out += f"<p style='margin-bottom:1rem; opacity:0.8;'>{p.strip()}</p>"
+        clean_p = p.strip()
+        if clean_p:
+            if clean_p.startswith("**") and clean_p.endswith("**"):
+                header_text = clean_p[2:-2]
+                html_out += f"<h3 style='margin-top:1.5rem; margin-bottom:0.5rem; color:var(--p); font-size:1.25rem;'>{header_text}</h3>"
+            else:
+                html_out += f"<p style='margin-bottom:1rem; opacity:0.8;'>{clean_p}</p>"
     return html_out
 
 def get_theme_css():
@@ -256,6 +266,8 @@ def get_theme_css():
     .section-head h2 {{ font-size: 2.5rem; }}
     
     .grid-3 {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }}
+    .about-grid {{ display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }}
+    
     .card {{ background: var(--card); padding: 2rem; border-radius: var(--radius); border: 1px solid rgba(100,100,100,0.1); transition: 0.3s; height: 100%; display: flex; flex-direction: column; }}
     .card:hover {{ transform: translateY(-5px); box-shadow: 0 20px 40px -10px rgba(0,0,0,0.1); border-color: var(--s); }}
     
@@ -266,25 +278,44 @@ def get_theme_css():
     details summary {{ font-weight: bold; font-size: 1.1rem; }}
     details p {{ margin-top: 1rem; margin-bottom: 0; opacity: 0.8; }}
 
-    /* Footer Logic */
+    /* Footer & Social Icons */
     footer {{ background: var(--p); color: white; padding: 4rem 0; margin-top: auto; }}
     .footer-grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 3rem; }}
     .footer a, footer a {{ color: rgba(255,255,255,0.8) !important; text-decoration: none; display: block; margin-bottom: 0.5rem; transition: 0.3s; }}
     .footer a:hover, footer a:hover {{ color: #ffffff !important; text-decoration: underline; }}
     
+    .social-icon {{ width: 24px; height: 24px; fill: rgba(255,255,255,0.7); transition: 0.3s; }}
+    .social-icon:hover {{ fill: #ffffff; transform: scale(1.1); }}
+
+    /* Real Brand Share Buttons */
+    .share-btn {{ width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; transition: 0.3s; color: white; }}
+    .share-btn:hover {{ transform: scale(1.1); filter: brightness(1.1); }}
+    .share-btn svg {{ width: 20px; height: 20px; fill: currentColor; }}
+    
+    .share-wa {{ background: #25D366; }}
+    .share-fb {{ background: #1877F2; }}
+    .share-x {{ background: #000000; }}
+    .share-li {{ background: #0A66C2; }}
+    .share-cp {{ background: #64748b; }}
+    
     /* Product Detail Specifics */
     .detail-view {{ display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start; }}
-    @media(max-width: 768px) {{ .detail-view {{ grid-template-columns: 1fr; }} }}
-
+    
     /* Legal Page Formatting */
     .legal-text h1 {{ font-size: 3rem; margin-bottom: 2rem; }}
-    .legal-text p {{ margin-bottom: 1.5rem; }}
+    .legal-text h3 {{ margin-top: 2rem; font-size: 1.5rem; }}
 
     {anim_css}
     
+    /* MOBILE OPTIMIZATIONS */
     @media (max-width: 768px) {{
         .nav-links {{ display: none; }}
         .hero {{ min-height: 70vh; }}
+        .detail-view {{ grid-template-columns: 1fr; gap: 2rem; }}
+        /* FIX: Forces About Section to Stack properly on mobile */
+        .about-grid {{ grid-template-columns: 1fr !important; gap: 2rem; text-align: left; }}
+        .about-grid img {{ order: 2; margin-top: 1rem; }}
+        .about-grid div {{ order: 1; }}
     }}
     """
 
@@ -334,7 +365,6 @@ def gen_features():
     """
 
 def gen_stats():
-    # FIX: Explicit color:white to ensure visibility on dark background
     return f"""
     <div style="background:var(--p); color:white; padding:3rem 0; text-align:center;">
         <div class="container grid-3">
@@ -426,14 +456,15 @@ def gen_inventory():
     """
 
 def gen_about_section():
-    # FIX: Applied format_text to break the wall of text
-    formatted_about = format_text(about_txt)
+    # USES SHORT TEXT FOR HOME
+    formatted_about = format_text(about_short)
     return f"""
     <section id="about"><div class="container">
-        <div class="grid-3" style="grid-template-columns: 1fr 1fr; align-items:center;">
+        <div class="about-grid">
             <div class="reveal">
                 <h2 style="font-size:2.5rem; margin-bottom:1.5rem;">{about_h}</h2>
                 <div style="font-size:1.1rem; opacity:0.8; margin-bottom:2rem;">{formatted_about}</div>
+                <a href="about.html" class="btn btn-primary" style="padding: 0.8rem 2rem; font-size:0.9rem;">Read Our Full Story</a>
             </div>
             <img src="{about_img}" class="reveal" style="width:100%; border-radius:var(--radius); box-shadow:0 20px 50px -20px rgba(0,0,0,0.2); aspect-ratio:4/3; object-fit:cover;">
         </div>
@@ -441,7 +472,6 @@ def gen_about_section():
     """
 
 def gen_faq_section():
-    # NEW: Parsing logic for FAQ
     items = ""
     for line in faq_data.split('\n'):
         if "?" in line and not line.strip() == "":
@@ -459,11 +489,14 @@ def gen_faq_section():
     """
 
 def gen_footer():
-    # FIX: Added Social Links Logic
-    social_links_html = ""
-    if li_link: social_links_html += f'<a href="{li_link}" target="_blank">LinkedIn</a>'
-    if ig_link: social_links_html += f'<a href="{ig_link}" target="_blank">Instagram</a>'
-    
+    # FIX: SVG Icons for Socials
+    icons = ""
+    if fb_link: icons += f'<a href="{fb_link}" target="_blank"><svg class="social-icon" viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg></a>'
+    if ig_link: icons += f'<a href="{ig_link}" target="_blank"><svg class="social-icon" viewBox="0 0 24 24"><path d="M16.98 0a6.9 6.9 0 0 1 5.08 1.98A6.94 6.94 0 0 1 24 7.02v9.96c0 2.08-.68 3.87-1.98 5.13A7.14 7.14 0 0 1 16.94 24H7.06a7.06 7.06 0 0 1-5.03-1.89A6.96 6.96 0 0 1 0 16.94V7.02C0 2.8 2.8 0 7.02 0h9.96zM7.17 2.1c-1.4 0-2.6.48-3.46 1.33c-.85.85-1.33 2.06-1.33 3.46v10.3c0 1.3.47 2.5 1.33 3.36c.86.85 2.06 1.33 3.46 1.33h9.66c1.4 0 2.6-.48 3.46-1.33c.85-.85 1.33-2.06 1.33-3.46V6.89c0-1.4-.47-2.6-1.33-3.46c-.86-.85-2.06-1.33-3.46-1.33H7.17zm11.97 3.33c.77 0 1.4.63 1.4 1.4c0 .77-.63 1.4-1.4 1.4c-.77 0-1.4-.63-1.4-1.4c0-.77.63-1.4 1.4-1.4zM12 5.76c3.39 0 6.14 2.75 6.14 6.14c0 3.39-2.75 6.14-6.14 6.14c-3.39 0-6.14-2.75-6.14-6.14c0-3.39 2.75-6.14 6.14-6.14zm0 2.1c-2.2 0-3.99 1.79-3.99 4.04c0 2.25 1.79 4.04 3.99 4.04c2.2 0 3.99-1.79 3.99-4.04c0-2.25-1.79-4.04-3.99-4.04z"/></svg></a>'
+    if x_link: icons += f'<a href="{x_link}" target="_blank"><svg class="social-icon" viewBox="0 0 24 24"><path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584l-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"></path></svg></a>'
+    if li_link: icons += f'<a href="{li_link}" target="_blank"><svg class="social-icon" viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2a2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2zM4 2a2 2 0 1 1-2 2a2 2 0 0 1 2-2z"></path></svg></a>'
+    if yt_link: icons += f'<a href="{yt_link}" target="_blank"><svg class="social-icon" viewBox="0 0 24 24"><path d="M21.58 5.4c-.28-.81-1.12-1.4-2.23-1.4c-8.75 0-8.75 0-8.75 0s0 0-8.75 0c-1.11 0-1.95.59-2.23 1.4c-.28 1.11-.28 3.6-.28 3.6s0 2.49.28 3.6c.28.81 1.12 1.4 2.23 1.4c8.75 0 8.75 0 8.75 0s0 0 8.75 0c1.11 0 1.95-.59 2.23-1.4c.28-1.11.28-3.6.28-3.6s0-2.49-.28-3.6zM10 15V9l5.2 3L10 15z"></path></svg></a>'
+
     return f"""
     <footer><div class="container">
         <div class="footer-grid">
@@ -471,8 +504,8 @@ def gen_footer():
                 <h3 style="color:white; margin-bottom:1.5rem;">{biz_name}</h3>
                 <p style="opacity:0.8; font-size:0.9rem;">{biz_addr}</p>
                 <p style="opacity:0.8; font-size:0.9rem; margin-top:1rem;">{biz_email}</p>
-                <div style="margin-top:1.5rem; display:flex; gap:1rem;">
-                    {social_links_html}
+                <div style="margin-top:1.5rem; display:flex; gap:1.2rem; align-items:center;">
+                    {icons}
                 </div>
             </div>
             <div>
@@ -559,7 +592,7 @@ def gen_404_content():
     </section>
     """
 
-# --- NEW: DYNAMIC PRODUCT PAGE ---
+# --- NEW: DYNAMIC PRODUCT PAGE (WITH SOCIAL SHARING) ---
 def gen_product_page_content():
     return f"""
     <section style="padding-top:150px;">
@@ -588,9 +621,17 @@ def gen_product_page_content():
         return res;
     }}
 
+    // Share Functions
+    function shareFB(url) {{ window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url), '_blank'); }}
+    function shareWA(url, title) {{ window.open('https://wa.me/?text=' + encodeURIComponent(title + ' ' + url), '_blank'); }}
+    function shareX(url, title) {{ window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(title) + '&url=' + encodeURIComponent(url), '_blank'); }}
+    function shareLI(url) {{ window.open('https://www.linkedin.com/sharing/share-offsite/?url=' + encodeURIComponent(url), '_blank'); }}
+    function copyLink(url) {{ navigator.clipboard.writeText(url); alert('Link copied!'); }}
+
     async function loadProduct() {{
         const params = new URLSearchParams(window.location.search);
         const targetName = params.get('item');
+        const currentUrl = window.location.href;
         
         if(!targetName) {{
             document.getElementById('product-detail').innerHTML = '<h2>Product not found</h2>';
@@ -617,7 +658,24 @@ def gen_product_page_content():
                             <h1 style="font-size:3rem; line-height:1.1;">${{clean[0]}}</h1>
                             <p style="font-size:1.5rem; color:var(--s); font-weight:bold; margin-bottom:1.5rem;">${{clean[1]}}</p>
                             <p style="line-height:1.8; opacity:0.8; margin-bottom:2rem;">${{clean[2]}}</p>
-                            <a href="https://wa.me/{wa_num}?text=I am interested in ${{encodeURIComponent(clean[0])}}" target="_blank" class="btn btn-primary">Order on WhatsApp</a>
+                            
+                            <a href="https://wa.me/{wa_num}?text=I am interested in ${{encodeURIComponent(clean[0])}}" target="_blank" class="btn btn-primary" style="width:100%;">Order on WhatsApp</a>
+                            
+                            <div style="margin-top:2rem;">
+                                <p style="font-size:0.9rem; font-weight:bold; opacity:0.7;">SHARE THIS:</p>
+                                <div style="display:flex; gap:0.8rem;">
+                                    <button onclick="shareWA('${{currentUrl}}', '${{clean[0]}}')" class="share-btn share-wa"><svg viewBox="0 0 24 24"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21c5.46 0 9.91-4.45 9.91-9.91c0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2m.01 1.67c2.2 0 4.26.86 5.82 2.42a8.225 8.225 0 0 1 2.41 5.83c0 4.54-3.7 8.23-8.24 8.23c-1.48 0-2.93-.39-4.19-1.15l-.3-.17l-3.12.82l.83-3.04l-.2-.32a8.188 8.188 0 0 1-1.26-4.38c.01-4.54 3.7-8.24 8.25-8.24m-3.53 3.16c-.13 0-.35.05-.54.26c-.19.2-.72.7-.72 1.72s.73 2.01.83 2.14c.1.13 1.44 2.19 3.48 3.07c.49.21.87.33 1.16.43c.49.16.94.13 1.29.08c.4-.06 1.21-.5 1.38-.98c.17-.48.17-.89.12-.98c-.05-.09-.18-.13-.37-.23c-.19-.1-.1.13-.1.13s-1.13-.56-1.32-.66c-.19-.1-.32-.15-.45.05c-.13.2-.51.65-.62.78c-.11.13-.23.15-.42.05c-.19-.1-.8-.3-1.53-.94c-.57-.5-1.02-1.12-1.21-1.45c-.11-.19-.01-.29.09-.38c.09-.08.19-.23.29-.34c.1-.11.13-.19.19-.32c.06-.13.03-.24-.01-.34c-.05-.1-.45-1.08-.62-1.48c-.16-.4-.36-.34-.51-.35c-.11-.01-.25-.01-.4-.01Z"/></svg></button>
+                                    
+                                    <button onclick="shareFB('${{currentUrl}}')" class="share-btn share-fb"><svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg></button>
+                                    
+                                    <button onclick="shareX('${{currentUrl}}', '${{clean[0]}}')" class="share-btn share-x"><svg viewBox="0 0 24 24"><path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584l-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"></path></svg></button>
+                                    
+                                    <button onclick="shareLI('${{currentUrl}}')" class="share-btn share-li"><svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2a2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2zM4 2a2 2 0 1 1-2 2a2 2 0 0 1 2-2z"></path></svg></button>
+                                    
+                                    <button onclick="copyLink('${{currentUrl}}')" class="share-btn share-cp"><svg viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"></path></svg></button>
+                                </div>
+                            </div>
+
                             <br><br>
                             <a href="index.html#inventory" style="text-decoration:none; color:var(--txt); opacity:0.6;">&larr; Back to Shop</a>
                         </div>
@@ -653,7 +711,8 @@ st.subheader("🚀 Launchpad")
 preview_mode = st.radio("Preview Page:", ["Home", "About", "Contact", "Privacy", "Terms", "Product Detail (Demo)"], horizontal=True)
 
 # Generate static contents for other pages with better formatting
-about_content = f'<section class="hero" style="min-height:50vh;"><div class="container"><h1>About Us</h1></div></section><section><div class="container legal-text">{format_text(about_txt)}</div></section>'
+# FIX: Uses about_long for the actual About Page
+about_content = f'<section class="hero" style="min-height:50vh;"><div class="container"><h1>About Us</h1></div></section><section><div class="container legal-text">{format_text(about_long)}</div></section>'
 contact_content = f'<section class="hero" style="min-height:50vh;"><div class="container"><h1>Contact Us</h1></div></section><section><div class="container" style="text-align:center;"><h2>{biz_phone}</h2><p>{biz_addr}</p><br>{map_iframe}</div></section>'
 privacy_content = f'<section><div class="container legal-text"><h1>Privacy Policy</h1><br>{format_text(priv_txt)}</div></section>'
 terms_content = f'<section><div class="container legal-text"><h1>Terms of Service</h1><br>{format_text(term_txt)}</div></section>'
