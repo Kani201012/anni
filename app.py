@@ -2,11 +2,10 @@ import streamlit as st
 import zipfile
 import io
 import urllib.parse
-import datetime
 
 # --- 1. APP CONFIGURATION ---
 st.set_page_config(
-    page_title="Titan v26.2 | Omni Architect", 
+    page_title="Titan v26.3 | Omni Architect", 
     layout="wide", 
     page_icon="⚡",
     initial_sidebar_state="expanded"
@@ -52,7 +51,7 @@ st.markdown("""
         transition: transform 0.2s;
     }
     .stButton>button:hover { transform: translateY(-2px); }
-
+    
     /* Preview Frame */
     iframe { border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 20px 40px -10px rgba(0,0,0,0.1); }
     </style>
@@ -61,7 +60,7 @@ st.markdown("""
 # --- 3. SIDEBAR: THE CONTROL CENTER ---
 with st.sidebar:
     st.title("Titan Architect")
-    st.caption("v26.2 | Omni Core")
+    st.caption("v26.3 | Omni Core")
     st.divider()
     
     # 3.1 VISUAL DNA
@@ -95,7 +94,7 @@ with st.sidebar:
         show_stats = st.checkbox("Trust Stats/Logos", value=True)
         show_features = st.checkbox("Feature Grid", value=True)
         show_inventory = st.checkbox("Live Inventory (CSV)", value=True)
-        show_gallery = st.checkbox("Visual Gallery", value=True)
+        show_gallery = st.checkbox("Visual Gallery (About)", value=True)
         show_testimonials = st.checkbox("Testimonials", value=True)
         show_faq = st.checkbox("F.A.Q.", value=True)
         show_cta = st.checkbox("Final Call to Action", value=True)
@@ -137,27 +136,34 @@ with tabs[1]:
     hero_sub = st.text_input("Hero Subtext", "The all-in-one solution for modern enterprises looking to dominate their local market.")
     hero_img = st.text_input("Hero Background Image", "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=1600")
     
-    st.subheader("Trust Stats (The Blue Strip)")
-    st.caption("Enter your numbers below. They will appear in the dark blue strip.")
-    s1, s2, s3 = st.columns(3)
-    stat_1 = s1.text_input("Stat 1 (e.g. 10+)", "10+")
-    stat_1_txt = s1.text_input("Label 1", "Years")
-    stat_2 = s2.text_input("Stat 2 (e.g. 500+)", "500+")
-    stat_2_txt = s2.text_input("Label 2", "Clients")
-    stat_3 = s3.text_input("Stat 3 (e.g. 100%)", "100%")
-    stat_3_txt = s3.text_input("Label 3", "Satisfaction")
+    st.divider()
+    
+    # NEW: Dedicated Stats Input Section
+    st.subheader("Trust Stats Data")
+    st.caption("These numbers will appear on the dark banner. Leave blank to hide.")
+    col_s1, col_s2, col_s3 = st.columns(3)
+    stat_1 = col_s1.text_input("Stat 1 (e.g., Years)", "10+")
+    label_1 = col_s1.text_input("Label 1", "Years Experience")
+    
+    stat_2 = col_s2.text_input("Stat 2 (e.g., Clients)", "500+")
+    label_2 = col_s2.text_input("Label 2", "Happy Clients")
+    
+    stat_3 = col_s3.text_input("Stat 3 (e.g., Rating)", "100%")
+    label_3 = col_s3.text_input("Label 3", "Satisfaction")
 
+    st.divider()
+    
     st.subheader("Feature Grid")
     f_title = st.text_input("Features Title", "Our Expertise")
     feat_data = st.text_area("Features List (Title | Description)", 
                              "Global Reach | We operate in 50+ countries.\n24/7 Support | Always here when you need us.\nSecure Core | Bank-grade encryption standard.",
                              height=150)
     
-    st.subheader("About Section")
+    st.subheader("About / Gallery")
     about_h = st.text_input("About Title", "Our Legacy")
-    # FIX: Split into short summary (Home) and Full (About Page)
-    about_summary = st.text_area("Home Page Summary (Short)", "Founded in 2020, Nova Dynamics has revolutionized the way businesses approach digital transformation. We bridge the gap between complex challenges and elegant solutions.", height=100)
-    about_txt = st.text_area("Full About Description (About Page)", "The Future of Digital Architecture... (Paste your long text here). We specialize in building Liquid Infrastructure...", height=200)
+    # NEW: Instruction for user
+    st.caption("Tips: Use 'Enter' to create new paragraphs. Keep it concise for the homepage.")
+    about_txt = st.text_area("About Description", "Founded in 2020, Nova Dynamics has revolutionized the way businesses approach digital transformation.\n\nOur mission is simple: To provide liquid infrastructure for the modern web.", height=150)
     about_img = st.text_input("About Side Image", "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=1600")
 
 with tabs[2]:
@@ -169,15 +175,26 @@ with tabs[2]:
 with tabs[3]:
     st.subheader("Trust & Legal")
     testi_data = st.text_area("Testimonials (Name | Quote)", "TechDaily | A game changer for our ops.\nCEO, Acme | Highly recommended.", height=100)
-    # FIX: Clarified instruction for FAQ
+    
     st.subheader("Frequently Asked Questions")
-    faq_data = st.text_area("FAQ List (Question ? Answer)", "Is this secure? ? Yes, 100% encrypted.\nCan I cancel? ? Anytime, no hidden fees.", height=150)
+    st.caption("Format: Question? ? Answer (Use double ? as separator)")
+    faq_data = st.text_area("FAQ Data", "Is this secure? ? Yes, 100% encrypted.\nCan I cancel? ? Anytime.", height=100)
     
     l1, l2 = st.columns(2)
-    priv_txt = l1.text_area("Privacy Policy Text", "We respect your data...", height=150)
-    term_txt = l2.text_area("Terms of Service Text", "By using this site...", height=150)
+    priv_txt = l1.text_area("Privacy Policy Text", "We respect your data...\n\nData Collection:\nWe collect email and usage data.", height=200)
+    term_txt = l2.text_area("Terms of Service Text", "By using this site...\n\nUsage:\nYou agree to use the site legally.", height=200)
 
 # --- 5. COMPILER ENGINE ---
+
+def format_text(text):
+    """Converts newlines to HTML paragraphs for better formatting."""
+    if not text: return ""
+    paragraphs = text.split('\n')
+    html_out = ""
+    for p in paragraphs:
+        if p.strip():
+            html_out += f"<p style='margin-bottom:1rem; opacity:0.8;'>{p.strip()}</p>"
+    return html_out
 
 def get_theme_css():
     # Base Defaults
@@ -244,14 +261,10 @@ def get_theme_css():
     
     .prod-img {{ width: 100%; height: 250px; object-fit: cover; border-radius: calc(var(--radius) - 4px); margin-bottom: 1.5rem; background: #f1f5f9; }}
     
-    /* FAQ Specific CSS */
-    .faq-item {{ border-bottom: 1px solid rgba(100,100,100,0.1); padding: 1.5rem 0; }}
-    .faq-item h3 {{ font-size: 1.2rem; margin-bottom: 0.5rem; color: var(--txt); }}
-    .faq-item p {{ opacity: 0.8; font-size: 0.95rem; }}
-
-    /* FIX: Stats Section Visibility Force Color */
-    .stat-box h3 {{ color: #ffffff !important; font-size: 3rem; margin-bottom: 0.5rem; }}
-    .stat-box p {{ color: rgba(255,255,255,0.8); text-transform: uppercase; letter-spacing: 1px; }}
+    /* FAQ Styling */
+    details {{ background: var(--card); border: 1px solid rgba(100,100,100,0.1); border-radius: 8px; margin-bottom: 1rem; padding: 1rem; cursor: pointer; }}
+    details summary {{ font-weight: bold; font-size: 1.1rem; }}
+    details p {{ margin-top: 1rem; margin-bottom: 0; opacity: 0.8; }}
 
     /* Footer Logic */
     footer {{ background: var(--p); color: white; padding: 4rem 0; margin-top: auto; }}
@@ -259,8 +272,13 @@ def get_theme_css():
     .footer a, footer a {{ color: rgba(255,255,255,0.8) !important; text-decoration: none; display: block; margin-bottom: 0.5rem; transition: 0.3s; }}
     .footer a:hover, footer a:hover {{ color: #ffffff !important; text-decoration: underline; }}
     
+    /* Product Detail Specifics */
     .detail-view {{ display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start; }}
     @media(max-width: 768px) {{ .detail-view {{ grid-template-columns: 1fr; }} }}
+
+    /* Legal Page Formatting */
+    .legal-text h1 {{ font-size: 3rem; margin-bottom: 2rem; }}
+    .legal-text p {{ margin-bottom: 1.5rem; }}
 
     {anim_css}
     
@@ -313,6 +331,27 @@ def gen_features():
         <div class="section-head reveal"><h2>{f_title}</h2></div>
         <div class="grid-3">{cards}</div>
     </div></section>
+    """
+
+def gen_stats():
+    # FIX: Explicit color:white to ensure visibility on dark background
+    return f"""
+    <div style="background:var(--p); color:white; padding:3rem 0; text-align:center;">
+        <div class="container grid-3">
+            <div class="reveal">
+                <h3 style="color:#ffffff; margin:0; font-size:3rem;">{stat_1}</h3>
+                <p style="color:rgba(255,255,255,0.8); margin:0;">{label_1}</p>
+            </div>
+            <div class="reveal">
+                <h3 style="color:#ffffff; margin:0; font-size:3rem;">{stat_2}</h3>
+                <p style="color:rgba(255,255,255,0.8); margin:0;">{label_2}</p>
+            </div>
+            <div class="reveal">
+                <h3 style="color:#ffffff; margin:0; font-size:3rem;">{stat_3}</h3>
+                <p style="color:rgba(255,255,255,0.8); margin:0;">{label_3}</p>
+            </div>
+        </div>
+    </div>
     """
 
 def gen_inventory_js():
@@ -386,38 +425,45 @@ def gen_inventory():
     {gen_inventory_js() if sheet_url else ''}
     """
 
-# FIX: About Section is now shorter for Home Page
 def gen_about_section():
+    # FIX: Applied format_text to break the wall of text
+    formatted_about = format_text(about_txt)
     return f"""
     <section id="about"><div class="container">
         <div class="grid-3" style="grid-template-columns: 1fr 1fr; align-items:center;">
             <div class="reveal">
                 <h2 style="font-size:2.5rem; margin-bottom:1.5rem;">{about_h}</h2>
-                <div style="font-size:1.1rem; opacity:0.8; margin-bottom:2rem;">{about_summary}</div>
-                <a href="about.html" class="btn btn-primary">Read Our Full Story</a>
+                <div style="font-size:1.1rem; opacity:0.8; margin-bottom:2rem;">{formatted_about}</div>
             </div>
-            <img src="{about_img}" class="reveal" style="width:100%; border-radius:var(--radius); box-shadow:0 20px 50px -20px rgba(0,0,0,0.2);">
+            <img src="{about_img}" class="reveal" style="width:100%; border-radius:var(--radius); box-shadow:0 20px 50px -20px rgba(0,0,0,0.2); aspect-ratio:4/3; object-fit:cover;">
         </div>
     </div></section>
     """
 
-# FIX: Added FAQ Function
-def gen_faq():
-    if not show_faq: return ""
+def gen_faq_section():
+    # NEW: Parsing logic for FAQ
     items = ""
     for line in faq_data.split('\n'):
-        if "?" in line:
-            q, a = line.split('?', 1)
-            items += f'<div class="faq-item reveal"><h3>{q.strip()}?</h3><p>{a.strip()}</p></div>'
+        if "?" in line and not line.strip() == "":
+            parts = line.split('?', 1)
+            if len(parts) == 2:
+                q = parts[0].strip() + "?"
+                a = parts[1].replace("?", "").strip()
+                items += f"<details class='reveal'><summary>{q}</summary><p>{a}</p></details>"
     
     return f"""
-    <section id="faq" style="background:var(--card)"><div class="container">
+    <section id="faq" style="background:#f8fafc"><div class="container" style="max-width:800px;">
         <div class="section-head reveal"><h2>Frequently Asked Questions</h2></div>
-        <div style="max-width:800px; margin:0 auto;">{items}</div>
+        {items}
     </div></section>
     """
 
 def gen_footer():
+    # FIX: Added Social Links Logic
+    social_links_html = ""
+    if li_link: social_links_html += f'<a href="{li_link}" target="_blank">LinkedIn</a>'
+    if ig_link: social_links_html += f'<a href="{ig_link}" target="_blank">Instagram</a>'
+    
     return f"""
     <footer><div class="container">
         <div class="footer-grid">
@@ -425,6 +471,9 @@ def gen_footer():
                 <h3 style="color:white; margin-bottom:1.5rem;">{biz_name}</h3>
                 <p style="opacity:0.8; font-size:0.9rem;">{biz_addr}</p>
                 <p style="opacity:0.8; font-size:0.9rem; margin-top:1rem;">{biz_email}</p>
+                <div style="margin-top:1.5rem; display:flex; gap:1rem;">
+                    {social_links_html}
+                </div>
             </div>
             <div>
                 <h4 style="color:white; font-size:0.9rem; text-transform:uppercase; letter-spacing:1px; margin-bottom:1.5rem;">Explore</h4>
@@ -497,7 +546,7 @@ def build_page(title, content, extra_js=""):
     </html>
     """
 
-# --- 404 & Product Pages ---
+# --- NEW: GENERATE 404 PAGE ---
 def gen_404_content():
     return f"""
     <section class="hero" style="min-height:70vh;">
@@ -510,6 +559,7 @@ def gen_404_content():
     </section>
     """
 
+# --- NEW: DYNAMIC PRODUCT PAGE ---
 def gen_product_page_content():
     return f"""
     <section style="padding-top:150px;">
@@ -586,16 +636,14 @@ def gen_product_page_content():
 # --- 6. PAGE CONTENT GENERATION ---
 home_content = ""
 if show_hero: home_content += gen_hero()
-# FIX: Stats Section uses new inputs and forced White Text class 'stat-box'
-if show_stats: home_content += f'<div style="background:var(--p); color:white; padding:3rem 0; text-align:center;"><div class="container grid-3"><div class="reveal stat-box"><h3>{stat_1}</h3><p>{stat_1_txt}</p></div><div class="reveal stat-box"><h3>{stat_2}</h3><p>{stat_2_txt}</p></div><div class="reveal stat-box"><h3>{stat_3}</h3><p>{stat_3_txt}</p></div></div></div>'
+if show_stats: home_content += gen_stats()
 if show_features: home_content += gen_features()
 if show_inventory: home_content += gen_inventory()
 if show_gallery: home_content += gen_about_section()
 if show_testimonials: 
     t_cards = "".join([f'<div class="card reveal" style="text-align:center;"><i>"{x.split("|")[1]}"</i><br><br><b>- {x.split("|")[0]}</b></div>' for x in testi_data.split('\n') if "|" in x])
     home_content += f'<section style="background:#f8fafc"><div class="container"><div class="section-head reveal"><h2>Client Stories</h2></div><div class="grid-3">{t_cards}</div></div></section>'
-# FIX: Added FAQ Function call
-if show_faq: home_content += gen_faq()
+if show_faq: home_content += gen_faq_section()
 if show_cta: home_content += f'<section style="background:var(--s); color:white; text-align:center;"><div class="container reveal"><h2>Ready to Start?</h2><p style="margin-bottom:2rem;">Let us build your future today.</p><a href="contact.html" class="btn" style="background:white; color:var(--s);">Get a Quote</a></div></section>'
 
 # --- 7. RENDER & DEPLOY ---
@@ -604,19 +652,18 @@ st.subheader("🚀 Launchpad")
 
 preview_mode = st.radio("Preview Page:", ["Home", "About", "Contact", "Privacy", "Terms", "Product Detail (Demo)"], horizontal=True)
 
-# Generate static contents for other pages
-# FIX: About page now uses the Long Description
-about_page_content = f'<section class="hero" style="min-height:50vh;"><div class="container"><h1>About Us</h1></div></section><section><div class="container"><p style="font-size:1.2rem; line-height:1.8;">{about_txt}</p></div></section>'
+# Generate static contents for other pages with better formatting
+about_content = f'<section class="hero" style="min-height:50vh;"><div class="container"><h1>About Us</h1></div></section><section><div class="container legal-text">{format_text(about_txt)}</div></section>'
 contact_content = f'<section class="hero" style="min-height:50vh;"><div class="container"><h1>Contact Us</h1></div></section><section><div class="container" style="text-align:center;"><h2>{biz_phone}</h2><p>{biz_addr}</p><br>{map_iframe}</div></section>'
-privacy_content = f'<section><div class="container legal-text"><h1>Privacy Policy</h1><br>{priv_txt}</div></section>'
-terms_content = f'<section><div class="container legal-text"><h1>Terms of Service</h1><br>{term_txt}</div></section>'
+privacy_content = f'<section><div class="container legal-text"><h1>Privacy Policy</h1><br>{format_text(priv_txt)}</div></section>'
+terms_content = f'<section><div class="container legal-text"><h1>Terms of Service</h1><br>{format_text(term_txt)}</div></section>'
 
 c1, c2 = st.columns([3, 1])
 with c1:
     if preview_mode == "Home":
         st.components.v1.html(build_page("Home", home_content), height=600, scrolling=True)
     elif preview_mode == "About":
-        st.components.v1.html(build_page("About", about_page_content), height=600, scrolling=True)
+        st.components.v1.html(build_page("About", about_content), height=600, scrolling=True)
     elif preview_mode == "Contact":
         st.components.v1.html(build_page("Contact", contact_content), height=600, scrolling=True)
     elif preview_mode == "Privacy":
@@ -634,7 +681,7 @@ with c2:
         with zipfile.ZipFile(z_b, "a", zipfile.ZIP_DEFLATED, False) as zf:
             # 1. Main Pages
             zf.writestr("index.html", build_page("Home", home_content))
-            zf.writestr("about.html", build_page("About", about_page_content))
+            zf.writestr("about.html", build_page("About", about_content))
             zf.writestr("contact.html", build_page("Contact", contact_content))
             zf.writestr("privacy.html", build_page("Privacy Policy", privacy_content))
             zf.writestr("terms.html", build_page("Terms of Service", terms_content))
@@ -650,6 +697,7 @@ with c2:
             zf.writestr("robots.txt", robots_txt)
 
             # 5. Sitemap.xml
+            import datetime
             date_str = datetime.date.today().isoformat()
             sitemap_xml = f"""<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
