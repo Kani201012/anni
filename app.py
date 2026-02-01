@@ -26,8 +26,7 @@ st.markdown("""
         color: white; font-weight: 800; border: none; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
     }
     /* Preview Radio Buttons styling */
-    div[role="radiogroup"] { display: flex; gap: 10px; }
-    div[role="radiogroup"] label { background: white; padding: 5px 15px; border-radius: 20px; border: 1px solid #cbd5e1; }
+    div[role="radiogroup"] { display: flex; gap: 10px; background: #f1f5f9; padding: 10px; border-radius: 15px; border: 1px solid #e2e8f0; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -48,20 +47,18 @@ with st.sidebar:
             "Rose Gold"
         ])
         
-        # Theme Logic Colors
-        defaults = {"Light":("#0F172A","#3B82F6"), "Dark":("#F8FAFC","#60A5FA"), "Emerald":("#064E3B","#10B981"), 
-                    "Cyber":("#00FF41","#0D0D0D"), "Sunset":("#7C2D12","#F97316"), "Nordic":("#1E3A8A","#60A5FA"), "Rose":("#831843","#FB7185")}
+        # Color Presets
+        presets = {
+            "Clean Corporate (Light)": ("#0F172A", "#3B82F6"),
+            "Midnight SaaS (Dark)": ("#F8FAFC", "#60A5FA"),
+            "Emerald Forest": ("#064E3B", "#10B981"),
+            "Cyber Neon": ("#00FF41", "#0D0D0D"),
+            "Sunset Luxury": ("#7C2D12", "#F97316"),
+            "Nordic Frost": ("#1E3A8A", "#60A5FA"),
+            "Rose Gold": ("#831843", "#FB7185")
+        }
         
-        # Set colors based on theme selection
-        p_def = defaults["Light"][0]
-        s_def = defaults["Light"][1]
-        if "Dark" in theme_mode: p_def, s_def = defaults["Dark"]
-        elif "Emerald" in theme_mode: p_def, s_def = defaults["Emerald"]
-        elif "Cyber" in theme_mode: p_def, s_def = defaults["Cyber"]
-        elif "Sunset" in theme_mode: p_def, s_def = defaults["Sunset"]
-        elif "Nordic" in theme_mode: p_def, s_def = defaults["Nordic"]
-        elif "Rose" in theme_mode: p_def, s_def = defaults["Rose"]
-
+        p_def, s_def = presets[theme_mode]
         p_color = st.color_picker("Primary Brand Color", p_def) 
         s_color = st.color_picker("Accent (Buttons/Links)", s_def)  
         
@@ -70,6 +67,7 @@ with st.sidebar:
         border_rad = st.select_slider("Corner Radius", ["0px", "4px", "12px", "24px", "40px"], value="12px")
 
     with st.expander("🧩 Section Manager", expanded=False):
+        show_hero = st.checkbox("Hero Header", value=True)
         show_stats = st.checkbox("Trust Stats", value=True)
         show_features = st.checkbox("Feature Grid", value=True)
         show_inventory = st.checkbox("Inventory (CSV)", value=True)
@@ -78,6 +76,7 @@ with st.sidebar:
 
     with st.expander("⚙️ Technical SEO", expanded=False):
         gsc_tag = st.text_input("GSC Verification ID")
+        ga_tag = st.text_input("Google Analytics ID")
         og_image = st.text_input("OG Share Image URL")
 
 # --- 4. MAIN WORKSPACE ---
@@ -91,7 +90,7 @@ with tabs[0]:
     biz_addr = c2.text_area("Address", "101 Tech Plaza, Silicon Valley, CA", height=68)
     prod_url = c2.text_input("Production URL", "https://novadynamics.io")
     seo_d = st.text_input("Meta Description", "Premium services provided by Nova Dynamics.")
-    logo_url = st.text_input("Logo URL (Leave blank for text-logo)")
+    logo_url = st.text_input("Logo URL (Leave blank for text)")
     map_iframe = st.text_area("Map Embed Code", placeholder="Paste <iframe> from Google Maps")
 
 with tabs[1]:
@@ -100,12 +99,12 @@ with tabs[1]:
     hero_img = st.text_input("Hero BG Image", "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=1600")
     feat_data = st.text_area("Features (Title | Description)", "Global Reach | 50+ Countries.\n24/7 Support | Always Online.", height=100)
     about_h = st.text_input("About Title", "Our Legacy")
-    about_txt = st.text_area("About Story", "Nova Dynamics has revolutionized...", height=150)
+    about_txt = st.text_area("About Story", "Founded on excellence...", height=150)
     about_img = st.text_input("About Image", "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=1600")
 
 with tabs[2]:
     sheet_url = st.text_input("Google Sheet CSV Link")
-    custom_feat = st.text_input("Default Product Fallback Image", "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&q=80&w=800")
+    custom_feat = st.text_input("Default Product Image", "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&q=80&w=800")
 
 with tabs[3]:
     testi_data = st.text_area("Testimonials (Name | Quote)", "CEO | Amazing work.", height=100)
@@ -116,7 +115,6 @@ with tabs[3]:
 # --- 5. COMPILER ENGINE ---
 
 def get_theme_css():
-    # Dynamic CSS Variables based on Theme
     is_dark = any(x in theme_mode for x in ["Dark", "Cyber", "Midnight"])
     bg = "#0f172a" if is_dark else "#ffffff"
     txt = "#f1f5f9" if is_dark else "#0f172a"
@@ -129,44 +127,45 @@ def get_theme_css():
         --radius: {border_rad}; --nav: {nav};
         --h-font: '{h_font}', sans-serif; --b-font: '{b_font}', sans-serif;
     }}
-    body {{ background: var(--bg); color: var(--txt); font-family: var(--b-font); margin: 0; line-height: 1.6; }}
+    body {{ background: var(--bg); color: var(--txt); font-family: var(--b-font); margin: 0; line-height: 1.6; overflow-x: hidden; }}
     h1, h2, h3 {{ font-family: var(--h-font); color: var(--p); }}
     .container {{ max-width: 1200px; margin: 0 auto; padding: 0 20px; }}
-    nav {{ position: fixed; top: 0; width: 100%; z-index: 999; background: var(--nav); backdrop-filter: blur(10px); padding: 1rem 0; border-bottom: 1px solid rgba(128,128,128,0.1); }}
-    .btn {{ display: inline-block; padding: 0.8rem 2rem; border-radius: var(--radius); font-weight: 700; text-decoration: none; transition: 0.3s; }}
+    nav {{ position: fixed; top: 0; width: 100%; z-index: 999; background: var(--nav); backdrop-filter: blur(10px); padding: 1.2rem 0; border-bottom: 1px solid rgba(128,128,128,0.1); }}
+    .btn {{ display: inline-block; padding: 0.8rem 2.2rem; border-radius: var(--radius); font-weight: 700; text-decoration: none; transition: 0.3s; border: none; cursor: pointer; }}
     .btn-accent {{ background: var(--s); color: white !important; }}
-    .hero {{ padding: 150px 0 100px; text-align: center; background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('{hero_img}'); background-size: cover; color: white; }}
-    .hero h1 {{ color: white; font-size: 4rem; }}
-    section {{ padding: 80px 0; }}
-    .grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }}
+    .hero {{ padding: 180px 0 100px; text-align: center; background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('{hero_img}'); background-size: cover; background-position: center; color: white; }}
+    .hero h1 {{ color: white; font-size: clamp(2.5rem, 5vw, 4rem); }}
+    section {{ padding: 100px 0; }}
+    .grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }}
     
-    /* PRODUCT CARD FIX - NO TRUNCATION */
-    .card {{ background: var(--card); padding: 25px; border-radius: var(--radius); border: 1px solid rgba(128,128,128,0.1); transition: 0.3s; display: flex; flex-direction: column; }}
-    .card img {{ width: 100%; height: 200px; object-fit: cover; border-radius: 10px; margin-bottom: 15px; }}
-    .card h3 {{ margin: 0 0 10px; font-size: 1.4rem; }}
-    .card p {{ font-size: 0.95rem; opacity: 0.8; margin-bottom: 20px; flex-grow: 1; }} /* flex-grow ensures button stays at bottom */
+    /* CARDS - FULL DESCRIPTION FIX */
+    .card {{ background: var(--card); padding: 30px; border-radius: var(--radius); border: 1px solid rgba(128,128,128,0.15); transition: 0.3s; display: flex; flex-direction: column; height: 100%; }}
+    .card img {{ width: 100%; height: 220px; object-fit: cover; border-radius: calc(var(--radius) - 4px); margin-bottom: 20px; }}
+    .card p {{ font-size: 0.95rem; opacity: 0.8; margin-bottom: 25px; flex-grow: 1; }}
     
-    /* FOOTER FIX - NO BLUE LINKS */
-    footer {{ background: var(--p); color: white; padding: 60px 0; }}
-    footer a {{ color: rgba(255,255,255,0.7) !important; text-decoration: none !important; }}
+    /* FOOTER - LINK COLOR FIX */
+    footer {{ background: var(--p); color: white; padding: 80px 0; margin-top: 50px; }}
+    footer a {{ color: rgba(255,255,255,0.7) !important; text-decoration: none !important; transition: 0.3s; }}
     footer a:hover {{ color: white !important; }}
+    .footer-grid {{ display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 50px; }}
+    @media (max-width: 768px) {{ .footer-grid {{ grid-template-columns: 1fr; }} }}
     """
 
 def gen_nav():
     logo = f'<img src="{logo_url}" height="40">' if logo_url else f'<span style="font-weight:900; font-size:1.5rem; color:var(--p)">{biz_name}</span>'
     return f"""<nav><div class="container" style="display:flex; justify-content:space-between; align-items:center;">
     <a href="index.html" style="text-decoration:none;">{logo}</a>
-    <div style="display:flex; gap:20px; align-items:center;">
-        <a href="index.html" style="color:var(--txt); text-decoration:none;">Home</a>
-        <a href="about.html" style="color:var(--txt); text-decoration:none;">About</a>
-        <a href="contact.html" style="color:var(--txt); text-decoration:none;">Contact</a>
+    <div style="display:flex; gap:25px; align-items:center;">
+        <a href="index.html" style="color:var(--txt); text-decoration:none; font-weight:600;">Home</a>
+        <a href="about.html" style="color:var(--txt); text-decoration:none; font-weight:600;">About</a>
+        <a href="contact.html" style="color:var(--txt); text-decoration:none; font-weight:600;">Contact</a>
         <a href="tel:{biz_phone}" class="btn btn-accent">CALL NOW</a>
     </div></div></nav>"""
 
 def gen_inventory_block():
     if not show_inventory: return ""
     return f"""<section id="inventory" style="background:rgba(0,0,0,0.02);"><div class="container">
-    <h2 style="text-align:center; margin-bottom:50px;">Live Inventory</h2>
+    <h2 style="text-align:center; margin-bottom:60px; font-size:2.5rem;">Live Inventory</h2>
     <div id="inv-grid" class="grid"><p style="text-align:center; grid-column: 1/-1;">Loading Items...</p></div>
     </div></section>
     <script>
@@ -186,8 +185,8 @@ def gen_inventory_block():
                 grid.innerHTML += `
                 <div class="card">
                     <img src="${{img}}" onerror="this.src='{custom_feat}'">
-                    <h3>${{clean[0]}}</h3>
-                    <p style="font-weight:bold; color:var(--s);">${{clean[1]}}</p>
+                    <h3 style="color:var(--p)">${{clean[0]}}</h3>
+                    <p style="font-weight:bold; color:var(--s); margin:5px 0 15px;">${{clean[1]}}</p>
                     <p>${{clean[2] || ''}}</p>
                     <a href="https://wa.me/{biz_phone.replace(' ','').replace('+','')}?text=Interest: ${{clean[0]}}" class="btn btn-accent" style="text-align:center;">Order Now</a>
                 </div>`;
@@ -199,43 +198,47 @@ def gen_inventory_block():
 
 def build_page(title, content):
     css = get_theme_css()
-    return f"""<!DOCTYPE html><html><head><meta charset="UTF-8"><title>{title} | {biz_name}</title>
+    analytics = f"<script async src='https://www.googletagmanager.com/gtag/js?id={ga_tag}'></script><script>window.dataLayer=window.dataLayer||[];function gtag(){{dataLayer.push(arguments);}}gtag('js',new Date());gtag('config','{ga_tag}');</script>" if ga_tag else ""
+    
+    return f"""<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>{title} | {biz_name}</title>
     <meta name="description" content="{seo_d}"><style>{css}</style>
     <link href="https://fonts.googleapis.com/css2?family={h_font.replace(' ','+')}&family={b_font.replace(' ','+')}&display=swap" rel="stylesheet">
-    </head><body>{gen_nav()}{content}
-    <footer><div class="container grid">
-        <div><h3>{biz_name}</h3><p>{biz_addr}</p></div>
-        <div><h4>Links</h4><a href="about.html">About Us</a><br><a href="contact.html">Contact</a></div>
-        <div><h4>Legal</h4><a href="privacy.html">Privacy Policy</a><br><a href="terms.html">Terms</a></div>
-    </div></footer></body></html>"""
+    {analytics}</head><body>{gen_nav()}{content}
+    <footer><div class="container footer-grid">
+        <div><h3 style="color:white">{biz_name}</h3><p style="opacity:0.7">{biz_addr}</p><p style="opacity:0.7">{biz_email}</p></div>
+        <div><h4 style="color:white">Links</h4><a href="index.html">Home</a><br><a href="about.html">About Us</a><br><a href="contact.html">Contact</a></div>
+        <div><h4 style="color:white">Legal</h4><a href="privacy.html">Privacy Policy</a><br><a href="terms.html">Terms</a></div>
+    </div><div style="text-align:center; padding-top:40px; opacity:0.3; font-size:0.8rem;">&copy; {biz_name}. All Rights Reserved.</div></footer></body></html>"""
 
 # --- 6. PAGE CONTENT GENERATORS ---
 def gen_home_content():
-    c = f'<section class="hero"><div class="container"><h1>{hero_h}</h1><p>{hero_sub}</p><a href="#inventory" class="btn btn-accent">View Products</a></div></section>'
+    c = ""
+    if show_hero: c += f'<section class="hero"><div class="container"><h1>{hero_h}</h1><p style="font-size:1.2rem; margin-bottom:30px; opacity:0.9;">{hero_sub}</p><a href="#inventory" class="btn btn-accent">View Products</a></div></section>'
+    if show_stats: c += f'<div style="background:var(--p); color:white; padding:50px 0;"><div class="container grid" style="text-align:center;"><div><h2>10+</h2><p>Years</p></div><div><h2>500+</h2><p>Clients</p></div><div><h2>100%</h2><p>Secure</p></div></div></div>'
     if show_features:
-        f_cards = "".join([f'<div class="card"><h3>{l.split("|")[0]}</h3><p>{l.split("|")[1]}</p></div>' for l in feat_data.split('\n') if "|" in l])
-        c += f'<section id="features"><div class="container"><h2 style="text-align:center;">Expertise</h2><div class="grid">{f_cards}</div></div></section>'
+        f_cards = "".join([f'<div class="card"><h3>{l.split("|")[0].strip()}</h3><p>{l.split("|")[1].strip()}</p></div>' for l in feat_data.split('\n') if "|" in l])
+        c += f'<section id="features"><div class="container"><h2 style="text-align:center; margin-bottom:50px;">Core Expertise</h2><div class="grid">{f_cards}</div></div></section>'
     c += gen_inventory_block()
     return c
 
 def gen_about_content():
-    return f'<section class="hero" style="min-height:40vh;"><h1>{about_h}</h1></section><section><div class="container grid" style="grid-template-columns: 1fr 1fr;"><div><p>{about_txt}</p></div><img src="{about_img}" style="width:100%; border-radius:12px;"></div></section>'
+    return f'<section class="hero" style="min-height:40vh;"><h1>{about_h}</h1></section><section><div class="container grid" style="grid-template-columns: 1.2fr 0.8fr; align-items:center;"><div><p style="font-size:1.1rem;">{about_txt}</p></div><img src="{about_img}" style="width:100%; border-radius:12px; box-shadow:0 20px 40px rgba(0,0,0,0.1);"></div></section>'
 
 def gen_contact_content():
-    return f'<section class="hero" style="min-height:40vh;"><h1>Get in Touch</h1></section><section><div class="container grid"><div><h2>Contact Us</h2><p><b>Phone:</b> {biz_phone}</p><p><b>Email:</b> {biz_email}</p><p><b>Address:</b> {biz_addr}</p></div><div>{map_iframe}</div></div></section>'
+    return f'<section class="hero" style="min-height:40vh;"><h1>Get in Touch</h1></section><section><div class="container grid"><div><h2>Contact Details</h2><p><b>Phone:</b> {biz_phone}</p><p><b>Email:</b> {biz_email}</p><p><b>Address:</b> {biz_addr}</p></div><div style="border-radius:20px; overflow:hidden; border:1px solid #ddd;">{map_iframe}</div></div></section>'
 
 # --- 7. PREVIEW & DEPLOY ---
 st.divider()
 st.subheader("🚀 Live Multi-Page Preview")
-prev_page = st.radio("Switch Page to Preview", ["Home", "About", "Contact", "Privacy", "Terms"], horizontal=True)
+prev_page = st.radio("Select Page to Preview:", ["Home", "About", "Contact", "Privacy", "Terms"], horizontal=True)
 
 if prev_page == "Home": html = build_page("Home", gen_home_content())
 elif prev_page == "About": html = build_page("About", gen_about_content())
 elif prev_page == "Contact": html = build_page("Contact", gen_contact_content())
 elif prev_page == "Privacy": html = build_page("Privacy", f'<section><div class="container"><h1>Privacy Policy</h1><p>{priv_txt}</p></div></section>')
-else: html = build_page("Terms", f'<section><div class="container"><h1>Terms</h1><p>{term_txt}</p></div></section>')
+else: html = build_page("Terms", f'<section><div class="container"><h1>Terms of Service</h1><p>{term_txt}</p></div></section>')
 
-st.components.v1.html(html, height=600, scrolling=True)
+st.components.v1.html(html, height=700, scrolling=True)
 
 if st.button("🚀 DEPLOY FULL PACKAGE"):
     z_b = io.BytesIO()
@@ -244,5 +247,5 @@ if st.button("🚀 DEPLOY FULL PACKAGE"):
         zf.writestr("about.html", build_page("About", gen_about_content()))
         zf.writestr("contact.html", build_page("Contact", gen_contact_content()))
         zf.writestr("privacy.html", build_page("Privacy", f'<section><div class="container"><h1>Privacy Policy</h1><p>{priv_txt}</p></div></section>'))
-        zf.writestr("terms.html", build_page("Terms", f'<section><div class="container"><h1>Terms</h1><p>{term_txt}</p></div></section>'))
-    st.download_button("📥 Download Final Zip", z_b.getvalue(), f"{biz_name.lower().replace(' ','_')}_v26.zip")
+        zf.writestr("terms.html", build_page("Terms", f'<section><div class="container"><h1>Terms of Service</h1><p>{term_txt}</p></div></section>'))
+    st.download_button("📥 Download Final Zip", z_b.getvalue(), f"{biz_name.lower().replace(' ','_')}_site.zip")
